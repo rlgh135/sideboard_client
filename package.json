@@ -13,6 +13,7 @@
     "@hello-pangea/dnd": "^18.0.1",
     "@stomp/stompjs": "^7.2.1",
     "axios": "^1.13.2",
+    "immer": "^11.0.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "sockjs-client": "^1.6.1",
