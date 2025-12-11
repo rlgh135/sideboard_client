@@ -66,7 +66,7 @@ export const useBoardStore = create<BoardState>()(
 
         fetchBoard: async () => {
             try {
-                const response = await axios.get(`${API_URL}/api/board`);
+                const response = await api.get('/api/board');
                 // Immer를 쓰면 그냥 대입해도 되지만, 통채로 바꿀 땐 set이 편함
                 set({ columns: response.data });
                 console.log('>>> 보드 데이터 로딩 완료', response.data);
@@ -106,13 +106,15 @@ export const useBoardStore = create<BoardState>()(
 
                     // [추가] 에러 메시지 구독 (롤백 로직)
                     client.subscribe('/user/queue/errors', (message) => {
-                        const errorMessage = message.body;
+                        // 서버가 JSON 객체를 보내므로 parsing 필요
+                        const body = JSON.parse(message.body);
+                        const errorMessage = body.message || "알 수 없는 오류";
                         
                         // 알림 표시
                         alert(`🚫 오류: ${errorMessage}`);
                         
-                        // 중요: 에러가 났으므로 서버의 최신 상태(이동 전 상태)를 다시 가져옴
-                        get().fetchBoard(); 
+                        // 중요: 에러가 났으므로 서버의 최신 상태(이동 전 상태)를 다시 가져옴 (롤백)
+                        get().fetchBoard();
                     });
                 },
                 onDisconnect: () => {
@@ -204,7 +206,7 @@ export const useBoardStore = create<BoardState>()(
         // 카드 생성
         createCard: async (title, content, columnId) => {
             try {
-                await axios.post(`${API_URL}/api/cards`, {
+                await api.post('/api/cards', {
                     title,
                     content,
                     columnId
@@ -219,7 +221,7 @@ export const useBoardStore = create<BoardState>()(
         // 카드 수정
         updateCard: async (cardId, title, content) => {
             try {
-                await axios.put(`${API_URL}/api/cards/${cardId}`, {
+                await api.put(`/api/cards/${cardId}`, {
                     title,
                     content
                 });
